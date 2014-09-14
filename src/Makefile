@@ -1,10 +1,10 @@
-OBJS = nlang.o parser.o lex.o #LinkedList.o
+OBJS = nlang.o parser.o lex.o LinkedList.o
 bindir = /usr/bin/
 GCC = $(bindir)gcc
 MAKE=$(bindir)make
 RM=rm
 # CFLAGS = -O2
-CFLAGS = -O0 -g -I../include
+CFLAGS = -O0 -g -Wall -I../include
 
 all: nlang
 

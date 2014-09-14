@@ -1,17 +1,8 @@
 #include "nlang.h"
 
-typedef struct _node{
-  int index;
-  Data data;
-} Node;
-
 typedef struct __linkedlist {
   Node *node;
-  Node *next;
-  Node *prev;
 } _linkedlist;
-
-typedef void (*fptrEachFunc)(Data);
 
 LinkedList linkedlist_initialize();
 Data linkedlist_get_next(LinkedList);
@@ -19,6 +10,7 @@ void linkedlist_free(LinkedList);
 void linkedlist_add(LinkedList, Data);
 void linkedlist_move_pos(LinkedList, int);
 void linkedlist_validate(LinkedList);
+void linkedlist_each_function(LinkedList, fptrEachFunc);
 Node* node_initialize(int);
 void node_free(Node*);
 
@@ -34,45 +26,60 @@ Node* node_initialize(int index) {
   malloc_s(node, Node, 1);
   node->index = index;
   node->data = NULL;
+  node->next = NULL;
+  node->prev = NULL;
   return node;
+}
+
+
+void node_free(Node *node) {
+  if(node == NULL) return;
+  if(node->next != NULL) {
+    node_free(node->next);
+  }
+  free_s(node);
 }
 
 void linkedlist_add(LinkedList list, Data data) {
 	linkedlist_validate(list);
 	Node* node = node_initialize(list->node->index + 1);
 	node->data = data;
-	list->prev = list->node;
-	list->next = node;
+	node->prev = list->node;
+	list->node->next = node;
 	list->node = node;
 }
 
 void linkedlist_each_function(LinkedList list, fptrEachFunc func) {
-	//int save = list->node->index;
+	int save = list->node->index;
 	linkedlist_move_pos(list, 0);
-	while(list->node != NULL) {
-		
+	while(1) {
+		func(list->node);
+    if(list->node->next == NULL) break;
+    list->node = list->node->next;
 	}
+  linkedlist_move_pos(list, save);
 }
 
 void linkedlist_move_pos(LinkedList list, int index) {
 	bool isNext = true;
-  
 	if(list->node->index == index) return;
-  if(list->node->index > index) isNext = false;
+  if(list->node->index > index) {
+    isNext = false;
+  }
   
 	while(1) {
-		if((isNext ? list->next : list->prev) == NULL) {
-      debug_log("Error: Index Overflow: %d", index);
+		if((isNext ? list->node->next : list->node->prev) == NULL) {
+      debug_log("Error: Index Overflow: %d\n", index);
       abort();
     }
-    list->node = isNext ? list->next : list->prev;
-    
+    list->node = isNext ? list->node->next : list->node->prev;
     if(list->node->index == index) return;
 	}
 }
 
 void linkedlist_free(LinkedList list) {
 	linkedlist_validate(list);
+  linkedlist_move_pos(list, 0);
 	node_free(list->node);
 	free_s(list);
 }

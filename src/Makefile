@@ -1,4 +1,4 @@
-OBJS = nlang.o parser.o lex.o LinkedList.o
+OBJS = nlang.o parser.o lex.o LinkedList.o vm.o
 bindir = /usr/bin/
 GCC = $(bindir)gcc
 MAKE=$(bindir)make

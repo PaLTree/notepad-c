@@ -32,6 +32,16 @@ Node* node_initialize(int index) {
 }
 
 
+Data linkedlist_get_next(LinkedList list) {
+  if(list->node->next != NULL) {
+    list->node = list->node->next;
+    return list->node;
+  } else {
+    linkedlist_move_pos(list, 0);
+    return NULL;
+  }
+}
+
 void node_free(Node *node) {
   if(node == NULL) return;
   if(node->next != NULL) {
